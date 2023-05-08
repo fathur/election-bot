@@ -99,7 +99,7 @@ class QueryBuilder:
 
 
 class PollMaker:
-    SEARCH_LAST_MINUTES = 20
+    SEARCH_LAST_MINUTES = 30
     POLL_DURATION_MINUTES = 24 * 60
 
     def __init__(self, client: Client):
