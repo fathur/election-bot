@@ -45,7 +45,9 @@ class QueryBuilder:
         "TirtoID": Category.MEDIA,
         "VIVAcoid": Category.MEDIA,
         "CNNIndonesia": Category.MEDIA,
-        "korantempo": Category.MEDIA,
+        # "korantempo": Category.MEDIA,
+        # "temponewsroom": Category.MEDIA,
+        "tempodotco": Category.MEDIA,
         "PKSejahtera": Category.PARTY,
         "PDI_Perjuangan": Category.PARTY,
         "DPP_PPP": Category.PARTY,
@@ -56,9 +58,9 @@ class QueryBuilder:
         "PartaiPerindo": Category.PARTY,
         "OfficialDPP_PBB": Category.PARTY,
         "kumparan": Category.MEDIA,
+        "kompascom": Category.MEDIA,
         # "jawapos": Category.MEDIA,
         "tribunnews": Category.MEDIA,
-        "temponewsroom": Category.MEDIA,
         "liputan6dotcom": Category.MEDIA,
         "Beritasatu": Category.MEDIA,
         "okezonenews": Category.MEDIA,
@@ -123,6 +125,7 @@ class PollMaker:
                 user_auth=True,
                 user_fields="id,username,name",
                 expansions="author_id",
+                max_results=100,
             )
 
             meta = response.meta
