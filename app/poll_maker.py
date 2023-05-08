@@ -97,7 +97,7 @@ class QueryBuilder:
 
 
 class PollMaker:
-    SEARCH_LAST_MINUTES = 60 * 3
+    SEARCH_LAST_MINUTES = 20
     POLL_DURATION_MINUTES = 24 * 60
 
     def __init__(self, client: Client):
@@ -121,8 +121,8 @@ class PollMaker:
                 sort_order="recency",
                 next_token=next_token,
                 user_auth=True,
-                user_fields='id,username,name',
-                expansions='author_id'
+                user_fields="id,username,name",
+                expansions="author_id",
             )
 
             meta = response.meta
@@ -137,15 +137,9 @@ class PollMaker:
                 loop = False
 
     def build_query(self):
-        return QueryBuilder().for_me()
-        # QueryBuilder().for_candidates()
+        # return QueryBuilder().for_me()
+        return QueryBuilder().for_candidates()
         # QueryBuilder().for_parties()
-
-    def lookup_user_id(self, username: str):
-        # todo: store it in db
-
-        user = self.client.get_user(username=username, user_auth=True,)
-        return user.data.id
 
     def set_poll(self, tweet: Tweet):
         if self.has_poll(tweet):
@@ -162,44 +156,51 @@ class PollMaker:
         self.insert_poll_to_db(response, tweet)
 
     def insert_poll_to_db(self, response, tweet):
-        object_id = response.data['id']
-        poll = Poll.create({
-            "tweet_id": tweet.id,
-            "object_id": object_id,
-            "url": f"https://twitter.com/PemiluKitaBot/status/{object_id}",
-            "start_at": pendulum.now().to_datetime_string(),
-            "end_at": pendulum.now().add(minutes=self.POLL_DURATION_MINUTES).to_datetime_string()
-        })
+        object_id = response.data["id"]
+        poll = Poll.create(
+            {
+                "tweet_id": tweet.id,
+                "object_id": object_id,
+                "url": f"https://twitter.com/PemiluKitaBot/status/{object_id}",
+                "start_at": pendulum.now().to_datetime_string(),
+                "end_at": pendulum.now()
+                .add(minutes=self.POLL_DURATION_MINUTES)
+                .to_datetime_string(),
+            }
+        )
         for choice in self.poll_choices:
-            PollResult.create({
-                "poll_id": poll.id,
-                "poll_choice_id": choice.id
-            })
+            PollResult.create({"poll_id": poll.id, "poll_choice_id": choice.id})
 
     def decide_to_post_poll(self, data):
         for item in data:
-
             tweet = Tweet.where({"object_id": item.id}).first()
             if not tweet:
-                tweet_detail = self.client.get_tweet(item.id, user_auth=True,
-                user_fields='id,username,name',
-                expansions='author_id')
-                user = tweet_detail.includes['users'][0]
+                tweet_detail = self.client.get_tweet(
+                    item.id,
+                    user_auth=True,
+                    user_fields="id,username,name",
+                    expansions="author_id",
+                )
+                user = tweet_detail.includes["users"][0]
 
                 account = Account.where({"object_id": user.id}).first()
                 if not account:
-                    account = Account.create({
-                        "object_id": user.id,
-                        "username": user.username,
-                        "name": user.name
-                    })
+                    account = Account.create(
+                        {
+                            "object_id": user.id,
+                            "username": user.username,
+                            "name": user.name,
+                        }
+                    )
 
-                tweet = Tweet.create({
-                    "account_id": account.id,
-                    "object_id": item.id,
-                    "text": item.text,
-                    "url": f"https://twitter.com/{account.username}/status/{item.id}"
-                })
+                tweet = Tweet.create(
+                    {
+                        "account_id": account.id,
+                        "object_id": item.id,
+                        "text": item.text,
+                        "url": f"https://twitter.com/{account.username}/status/{item.id}",
+                    }
+                )
 
             if self.has_poll(tweet):
                 continue
