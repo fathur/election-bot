@@ -1,3 +1,4 @@
+import copy
 from enum import Enum
 
 import pendulum
@@ -145,12 +146,13 @@ class PollMaker:
         logger.info("Created poll")
 
     def shuffle_candidates(self) -> list[str]:
+        candidates = copy.deepcopy(self.candidates)
         append = None
-        if self.NOT_CHOOSE_STRING in self.candidates:
+        if self.NOT_CHOOSE_STRING in candidates:
             append = self.NOT_CHOOSE_STRING
-            self.candidates.remove(self.NOT_CHOOSE_STRING)
+            candidates.remove(self.NOT_CHOOSE_STRING)
 
-        candidates = np.array(self.candidates)
+        candidates = np.array(candidates)
         np.random.shuffle(candidates)
         candidates = candidates.tolist()
         if append is not None:
