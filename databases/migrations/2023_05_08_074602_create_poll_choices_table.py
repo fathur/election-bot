@@ -10,7 +10,7 @@ class CreatePollChoicesTable(Migration):
         """
         with self.schema.create("poll_choices") as table:
             table.increments("id")
-            table.string('option')
+            table.string("option")
             table.timestamps()
 
     def down(self):
