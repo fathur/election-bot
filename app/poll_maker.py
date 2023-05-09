@@ -71,17 +71,25 @@ class QueryBuilder:
         "detikcom": Category.MEDIA,
     }
 
-    def for_media(self):
-        return f"{self.keywords_statement} {self.target_statement(Category.MEDIA)} -is:retweet -is:reply -is:quote"
+    @classmethod
+    def for_media(cls):
+        klass = cls()
+        return f"{klass.keywords_statement} {klass.target_statement(Category.MEDIA)} -is:retweet -is:reply -is:quote"
 
-    def for_candidates(self):
-        return f"{self.target_statement(Category.CANDIDATE)} -is:retweet -is:reply -is:quote"
+    @classmethod
+    def for_candidates(cls):
+        klass = cls()
+        return f"{klass.target_statement(Category.CANDIDATE)} -is:retweet -is:reply -is:quote"
 
-    def for_parties(self):
-        return f"{self.keywords_statement} {self.target_statement(Category.PARTY)} -is:retweet -is:reply -is:quote"
+    @classmethod
+    def for_parties(cls):
+        klass = cls()
+        return f"{klass.keywords_statement} {klass.target_statement(Category.PARTY)} -is:retweet -is:reply -is:quote"
 
-    def for_me(self):
-        return f"from:{self.MY_USERNAME} OR from:PemiluKitaBot"
+    @classmethod
+    def for_me(cls):
+        klass = cls()
+        return f"from:{klass.MY_USERNAME} OR from:PemiluKitaBot"
 
     @property
     def keywords_statement(self):
@@ -114,37 +122,11 @@ class PollMaker:
 
     def run(self):
         logger.info("Running poll maker")
-        loop = True
-        next_token = None
-        while loop:
-            response = self.client.search_recent_tweets(
-                query=self.build_query(),
-                start_time=pendulum.now().subtract(minutes=self.SEARCH_LAST_MINUTES),
-                end_time=pendulum.now().subtract(seconds=15),
-                sort_order="recency",
-                next_token=next_token,
-                user_auth=True,
-                user_fields="id,username,name",
-                expansions="author_id",
-                max_results=100,
-            )
 
-            meta = response.meta
-            data = response.data
-            logger.info(data)
-            if data is not None:
-                self.decide_to_post_poll(data)
+        self._execute_run(query=QueryBuilder.for_candidates())
+        self._execute_run(query=QueryBuilder.for_media())
 
-            if "next_token" in meta:
-                next_token = meta["next_token"]
-            else:
-                loop = False
         logger.info("Finish run poll maker")
-
-    def build_query(self):
-        # return QueryBuilder().for_me()
-        return QueryBuilder().for_candidates()
-        # QueryBuilder().for_parties()
 
     def set_poll(self, tweet: Tweet):
         if self.has_poll(tweet):
@@ -223,3 +205,34 @@ class PollMaker:
 
     def has_poll(self, tweet: Tweet):
         return Poll.where({"tweet_id": tweet.id}).exists()
+
+    def _execute_run(self, query):
+        logger.info({"Executing query": query})
+
+        loop = True
+        next_token = None
+        while loop:
+            response = self.client.search_recent_tweets(
+                query=query,
+                start_time=pendulum.now().subtract(minutes=self.SEARCH_LAST_MINUTES),
+                end_time=pendulum.now().subtract(seconds=15),
+                sort_order="recency",
+                next_token=next_token,
+                user_auth=True,
+                user_fields="id,username,name",
+                expansions="author_id",
+                max_results=100,
+            )
+
+            meta = response.meta
+            data = response.data
+            logger.info(data)
+            if data is not None:
+                self.decide_to_post_poll(data)
+
+            if "next_token" in meta:
+                next_token = meta["next_token"]
+            else:
+                loop = False
+
+        logger.info({"Executed query": query})
