@@ -25,12 +25,10 @@ class QueryBuilder:
         "pranowo",
         "prabowo",
         "subianto",
-        # "presiden",
         "capres",
         "cawapres",
         "pilpres",
         "election",
-        "2024",
         "pemilu",
     ]
 
@@ -79,7 +77,7 @@ class QueryBuilder:
     @classmethod
     def for_candidates(cls):
         klass = cls()
-        return f"{klass.target_statement(Category.CANDIDATE)} -is:retweet -is:reply -is:quote"
+        return f"{klass.target_statement(Category.CANDIDATE)} -is:retweet -is:reply"
 
     @classmethod
     def for_parties(cls):
@@ -109,16 +107,13 @@ class QueryBuilder:
 class PollMaker:
     SEARCH_LAST_MINUTES = 30
     POLL_DURATION_MINUTES = 24 * 60
+    NOT_CHOOSE_STRING = "Belum ada pilihan"
 
     def __init__(self, client: Client):
         self.client = client
 
         self.poll_choices = PollChoice.all()
-
-        candidates = self.poll_choices.pluck("option").serialize()
-        candidates = np.array(candidates)
-        np.random.shuffle(candidates)
-        self.candidates = candidates
+        self.candidates = self.poll_choices.pluck("option").serialize()
 
     def run(self):
         logger.info("Running poll maker")
@@ -133,16 +128,35 @@ class PollMaker:
             return
 
         logger.info("Creating poll")
+
         response = self.client.create_tweet(
             in_reply_to_tweet_id=tweet.object_id,
-            text="Siapakah calon presiden pilihamu di 2024? Vote sebagai bentuk kepedulianmu terhadap pemilu ini!",
-            poll_options=self.candidates.tolist(),
+            text=(
+                "Siapakah calon presiden pilihamu di 2024? "
+                "Vote sebagai bentuk kepedulianmu terhadap pemilu ini! \n\n"
+                "Retweet untuk menyebarkan, dan 🧡 jika bermanfaat."
+            ),
+            poll_options=self.shuffle_candidates(),
             poll_duration_minutes=self.POLL_DURATION_MINUTES,
-            user_auth=True,
+            user_auth=False,
         )
 
         self.insert_poll_to_db(response, tweet)
         logger.info("Created poll")
+
+    def shuffle_candidates(self) -> list[str]:
+        append = None
+        if self.NOT_CHOOSE_STRING in self.candidates:
+            append = self.NOT_CHOOSE_STRING
+            self.candidates.remove(self.NOT_CHOOSE_STRING)
+
+        candidates = np.array(self.candidates)
+        np.random.shuffle(candidates)
+        candidates = candidates.tolist()
+        if append is not None:
+            candidates.append(append)
+
+        return candidates
 
     def insert_poll_to_db(self, response, tweet):
         object_id = response.data["id"]
@@ -168,7 +182,7 @@ class PollMaker:
             if not tweet:
                 tweet_detail = self.client.get_tweet(
                     item.id,
-                    user_auth=True,
+                    user_auth=False,
                     user_fields="id,username,name",
                     expansions="author_id",
                 )
@@ -218,7 +232,7 @@ class PollMaker:
                 end_time=pendulum.now().subtract(seconds=15),
                 sort_order="recency",
                 next_token=next_token,
-                user_auth=True,
+                user_auth=False,
                 user_fields="id,username,name",
                 expansions="author_id",
                 max_results=100,
