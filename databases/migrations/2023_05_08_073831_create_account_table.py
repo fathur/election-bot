@@ -10,9 +10,9 @@ class CreateAccountTable(Migration):
         """
         with self.schema.create("accounts") as table:
             table.increments("id")
-            table.string('object_id')
-            table.string('username')
-            table.string('name')
+            table.string("object_id")
+            table.string("username")
+            table.string("name")
 
             table.timestamps()
 

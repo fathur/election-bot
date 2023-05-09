@@ -10,6 +10,4 @@ class PollChoiceTableSeeder(Seeder):
         """Run the database seeds."""
         options = ["Anies Baswedan", "Prabowo Subianto", "Ganjar Pranowo"]
         for item in options:
-            PollChoice.create({
-                "option": item
-            })
+            PollChoice.create({"option": item})

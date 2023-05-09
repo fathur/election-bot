@@ -10,14 +10,13 @@ class CreateTweetsTable(Migration):
         """
         with self.schema.create("tweets") as table:
             table.increments("id")
-            table.integer('account_id', nullable=True)
-            table.string('object_id')
-            table.string('url', nullable=True)
-            table.text('text')
+            table.integer("account_id", nullable=True)
+            table.string("object_id")
+            table.string("url", nullable=True)
+            table.text("text")
             table.timestamps()
 
-            table.foreign('account_id').references('id').on('accounts')
-
+            table.foreign("account_id").references("id").on("accounts")
 
     def down(self):
         """
