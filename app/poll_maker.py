@@ -7,7 +7,7 @@ import numpy as np
 from tweepy import Client, tweet as t_tweet
 
 from app.models import Tweet, Poll, PollChoice, PollResult, Account
-
+from loguru import logger
 
 class Category(Enum):
     CANDIDATE = 1
@@ -113,6 +113,8 @@ class PollMaker:
         self.candidates = candidates
 
     def run(self):
+        logger.info("Running poll maker")
+        breakpoint()
         loop = True
         next_token = None
         while loop:
