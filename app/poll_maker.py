@@ -1,12 +1,12 @@
-import string
 from enum import Enum
 
 import pendulum
 import numpy as np
 
-from tweepy import Client, tweet as t_tweet
+from tweepy import Client
 
 from app.models import Tweet, Poll, PollChoice, PollResult, Account
+from loguru import logger
 
 
 class Category(Enum):
@@ -113,6 +113,7 @@ class PollMaker:
         self.candidates = candidates
 
     def run(self):
+        logger.info("Running poll maker")
         loop = True
         next_token = None
         while loop:
@@ -130,7 +131,7 @@ class PollMaker:
 
             meta = response.meta
             data = response.data
-            print(data)
+            logger.info(data)
             if data is not None:
                 self.decide_to_post_poll(data)
 
@@ -138,6 +139,7 @@ class PollMaker:
                 next_token = meta["next_token"]
             else:
                 loop = False
+        logger.info("Finish run poll maker")
 
     def build_query(self):
         # return QueryBuilder().for_me()
@@ -148,6 +150,7 @@ class PollMaker:
         if self.has_poll(tweet):
             return
 
+        logger.info("Creating poll")
         response = self.client.create_tweet(
             in_reply_to_tweet_id=tweet.object_id,
             text="Siapakah calon presiden pilihamu di 2024? Vote sebagai bentuk kepedulianmu terhadap pemilu ini!",
@@ -157,6 +160,7 @@ class PollMaker:
         )
 
         self.insert_poll_to_db(response, tweet)
+        logger.info("Created poll")
 
     def insert_poll_to_db(self, response, tweet):
         object_id = response.data["id"]
@@ -175,7 +179,9 @@ class PollMaker:
             PollResult.create({"poll_id": poll.id, "poll_choice_id": choice.id})
 
     def decide_to_post_poll(self, data):
+        logger.info("Running decide to post poll")
         for item in data:
+            logger.info({"Checking item": item.id})
             tweet = Tweet.where({"object_id": item.id}).first()
             if not tweet:
                 tweet_detail = self.client.get_tweet(
@@ -196,6 +202,7 @@ class PollMaker:
                         }
                     )
 
+                logger.info(f"Storing Tweet {item.id}")
                 tweet = Tweet.create(
                     {
                         "account_id": account.id,
@@ -204,11 +211,15 @@ class PollMaker:
                         "url": f"https://twitter.com/{account.username}/status/{item.id}",
                     }
                 )
+                logger.info(f"Stored Tweet {item.id}")
 
             if self.has_poll(tweet):
                 continue
 
             self.set_poll(tweet)
+            logger.info({"Checked item": item.id})
+
+        logger.info("Finish run decide to post poll")
 
     def has_poll(self, tweet: Tweet):
         return Poll.where({"tweet_id": tweet.id}).exists()

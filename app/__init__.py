@@ -3,12 +3,14 @@ import os
 import tweepy
 from dotenv import load_dotenv
 from requests import Response
-
+from loguru import logger
 from app.poll_maker import PollMaker
+from app.config.log import LOG
 
 
 def run():
     load_dotenv()
+    logger.add(LOG["location"])
 
     client = tweepy.Client(
         consumer_key=os.getenv("TWITTER_API_KEY"),
