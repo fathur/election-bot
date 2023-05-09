@@ -1,3 +1,1 @@
-LOG = {
-    'location': 'storage/logs/app.log'
-}
+LOG = {"location": "storage/logs/app.log"}
