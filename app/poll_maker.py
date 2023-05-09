@@ -139,7 +139,7 @@ class PollMaker:
             ),
             poll_options=self.shuffle_candidates(),
             poll_duration_minutes=self.POLL_DURATION_MINUTES,
-            user_auth=False,
+            user_auth=True,
         )
 
         self.insert_poll_to_db(response, tweet)
