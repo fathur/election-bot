@@ -132,9 +132,9 @@ class PollMaker:
         response = self.client.create_tweet(
             in_reply_to_tweet_id=tweet.object_id,
             text=(
-                "Siapakah calon presiden pilihamu di 2024? "
+                "Siapakah calon presiden pilihanmu di 2024? "
                 "Vote sebagai bentuk kepedulianmu terhadap pemilu ini! \n\n"
-                "Retweet untuk menyebarkan, dan 🧡 jika bermanfaat."
+                "Retweet untuk menyebarkan, dan beri 🧡 jika bermanfaat."
             ),
             poll_options=self.shuffle_candidates(),
             poll_duration_minutes=self.POLL_DURATION_MINUTES,
