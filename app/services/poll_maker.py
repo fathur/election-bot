@@ -9,6 +9,8 @@ from tweepy import Client
 from app.models import Tweet, Poll, PollChoice, PollResult, Account
 from loguru import logger
 
+from app.services.clients import twitter
+
 
 class Category(Enum):
     CANDIDATE = 1
@@ -110,17 +112,21 @@ class PollMaker:
     POLL_DURATION_MINUTES = 24 * 60
     NOT_CHOOSE_STRING = "Belum ada pilihan"
 
+    enable_lookup_tweet = False
+
     def __init__(self, client: Client):
         self.client = client
 
         self.poll_choices = PollChoice.all()
         self.candidates = self.poll_choices.pluck("option").serialize()
 
-    def run(self):
+    @classmethod
+    def run(cls):
+        klass = cls(twitter())
         logger.info("Running poll maker")
 
-        self._execute_run(query=QueryBuilder.for_candidates())
-        self._execute_run(query=QueryBuilder.for_media())
+        klass.execute_run(query=QueryBuilder.for_candidates())
+        # klass.execute_run(query=QueryBuilder.for_media())
 
         logger.info("Finish run poll maker")
 
@@ -182,23 +188,7 @@ class PollMaker:
             logger.info({"Checking item": item.id})
             tweet = Tweet.where({"object_id": item.id}).first()
             if not tweet:
-                tweet_detail = self.client.get_tweet(
-                    item.id,
-                    user_auth=False,
-                    user_fields="id,username,name",
-                    expansions="author_id",
-                )
-                user = tweet_detail.includes["users"][0]
-
-                account = Account.where({"object_id": user.id}).first()
-                if not account:
-                    account = Account.create(
-                        {
-                            "object_id": user.id,
-                            "username": user.username,
-                            "name": user.name,
-                        }
-                    )
+                account = self.store_account(item)
 
                 logger.info(f"Storing Tweet {item.id}")
                 tweet = Tweet.create(
@@ -219,10 +209,32 @@ class PollMaker:
 
         logger.info("Finish run decide to post poll")
 
+    def store_account(self, item):
+        if self.enable_lookup_tweet is False:
+            return
+
+        tweet_detail = self.client.get_tweet(
+            item.id,
+            user_auth=False,
+            user_fields="id,username,name",
+            expansions="author_id",
+        )
+        user = tweet_detail.includes["users"][0]
+        account = Account.where({"object_id": user.id}).first()
+        if not account:
+            account = Account.create(
+                {
+                    "object_id": user.id,
+                    "username": user.username,
+                    "name": user.name,
+                }
+            )
+        return account
+
     def has_poll(self, tweet: Tweet):
         return Poll.where({"tweet_id": tweet.id}).exists()
 
-    def _execute_run(self, query):
+    def execute_run(self, query):
         logger.info({"Executing query": query})
 
         loop = True
