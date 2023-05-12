@@ -32,22 +32,8 @@ def create_poll():
     ),
 )
 def generate_report(interval):
+    import pendulum
+
     click.echo(f"Executing generate report {interval}")
-    Reporting.run(interval)
+    Reporting.run(interval, end_at=pendulum.datetime(2023, 5, 13))
     click.echo(f"Executed generate report {interval}")
-
-
-@run.command()
-def test():
-    arr = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n"]
-    click.echo(arr[0])
-    click.echo(arr[-1])
-    # ra = 14
-    # len(arr)
-    # loop_times = math.ceil(len(arr) / ra)
-    # start = 0
-    # total = ra
-    # for _ in range(0, loop_times):
-    #     click.echo(arr[start:total])
-    #     start += ra
-    #     total += ra

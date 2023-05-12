@@ -19,9 +19,9 @@ class Reporting:
         self.client = twitter()
 
     @classmethod
-    def run(cls, interval):
+    def run(cls, interval, end_at=None):
         klass = cls()
-        return getattr(klass, interval)(pendulum.datetime(2023, 5, 13))
+        return getattr(klass, interval)(end_at)
 
     def daily(self, end_at=None):
         if end_at is None:
