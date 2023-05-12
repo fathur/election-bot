@@ -112,7 +112,7 @@ class PollMaker:
     POLL_DURATION_MINUTES = 24 * 60
     NOT_CHOOSE_STRING = "Belum ada pilihan"
 
-    enable_lookup_tweet = False
+    enable_lookup_tweet = True
 
     def __init__(self, client: Client):
         self.client = client
@@ -121,12 +121,15 @@ class PollMaker:
         self.candidates = self.poll_choices.pluck("option").serialize()
 
     @classmethod
-    def run(cls):
+    def run(cls, kind):
         klass = cls(twitter())
         logger.info("Running poll maker")
 
-        klass.execute_run(query=QueryBuilder.for_candidates())
-        # klass.execute_run(query=QueryBuilder.for_media())
+        if kind == "candidate":
+            klass.execute_run(query=QueryBuilder.for_candidates())
+
+        if kind == "media":
+            klass.execute_run(query=QueryBuilder.for_media())
 
         logger.info("Finish run poll maker")
 
