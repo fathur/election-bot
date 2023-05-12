@@ -35,5 +35,14 @@ def generate_report(interval):
     import pendulum
 
     click.echo(f"Executing generate report {interval}")
-    Reporting.run(interval, end_at=pendulum.datetime(2023, 5, 13))
+    Reporting.run(interval, end_at=pendulum.datetime(2023, 5, 10))
     click.echo(f"Executed generate report {interval}")
+
+
+@run.command()
+def test():
+    d = {"apple": 15, "orange": 12, "banana": 10, "kiwi": 20}
+
+    # Sort the dictionary by value in descending order
+    sorted_d = dict(sorted(d.items(), key=lambda item: item[1], reverse=True))
+    click.echo(sorted_d)

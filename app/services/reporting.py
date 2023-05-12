@@ -180,6 +180,30 @@ class Reporting:
             {"total_voters": report_voters, "winner_resume": json.dumps(resume)}
         )
 
+        # Post to Twitter
+        total_polls = len(related_tweets.split(","))
+        start_at = (
+            pendulum.parse(first_tweet.start_at).add(hours=7).to_datetime_string()
+        )
+        end_at = pendulum.parse(last_tweet.end_at).add(hours=7).to_datetime_string()
+        sorted_resume = dict(
+            sorted(resume.items(), key=lambda item: item[1], reverse=True)
+        )
+        winner_text = ""
+        n = 1
+        for name in sorted_resume:
+            percentage = sorted_resume[name] / report_voters
+            percentage = round(percentage * 100, 2)
+            winner_text += f"{n}. {name}: {sorted_resume[name]} ({percentage}%)\n"
+            n += 1
+        text = (
+            f"Berikut hasil poll dari {report_voters} voter di {total_polls} polling "
+            f"yang dimulai dari {start_at} hingga {end_at}: \n"
+            f"{winner_text}"
+        )
+        self.client.create_tweet(text=text)
+        logger.info(text)
+
     def weekly(self):
         pass
 
