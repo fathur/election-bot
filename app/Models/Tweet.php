@@ -10,7 +10,7 @@ class Tweet extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['twitter_id', 'parent_id', 'account_id', 'url', 'text', 'type'];
+    protected $fillable = ['twitter_id', 'parent_id', 'account_id', 'url', 'text', 'type', 'alpha_tweet_id', 'alpha_poll_tweet_id'];
 
     public function account()
     {

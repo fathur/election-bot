@@ -9,6 +9,8 @@ class PollChoice extends Model
 {
     use HasFactory;
 
+    protected $fillable = ['option', 'alpha_poll_choice_id'];
+
     /**
      * The polls that belong to the PollChoice
      *

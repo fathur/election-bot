@@ -27,7 +27,7 @@ class Kernel extends ConsoleKernel
 
         // Run media schedule every 15 minutes in Saturday until Sunday, at 6 am untul 10pm
         $schedule->command('poll --target=media')->everyFifteenMinutes()
-            ->between('17:00', '21:00')
+            ->between('6:00', '21:00')
             ->days([0, 6])
             ->withoutOverlapping();
 
