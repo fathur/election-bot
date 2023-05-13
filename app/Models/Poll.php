@@ -10,7 +10,7 @@ class Poll extends Model
     use HasFactory;
 
     protected $fillable = ['start_at', 'end_at', 'total_voters', 'tweet_id', 'twitter_id'];
-    
+
     /**
      * Get the tweet that owns the Poll
      *

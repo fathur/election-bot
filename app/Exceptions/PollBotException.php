@@ -4,6 +4,6 @@ namespace App\Exceptions;
 
 use Exception;
 
-class PollBotException extends Exception {
-
+class PollBotException extends Exception
+{
 }

@@ -7,10 +7,11 @@ use Illuminate\Support\Facades\Cache;
 use App\Services\Twitter\Twitter;
 use App\Enums\AccountType;
 
-class QueryBuilder {
-    const CURRENT_USER_CACHE_KEY = 'current-twitter-user';
+class QueryBuilder
+{
+    public const CURRENT_USER_CACHE_KEY = 'current-twitter-user';
 
-    const KEYWORDS = [
+    public const KEYWORDS = [
         "anies",
         "baswedan",
         "ganjar",
@@ -25,7 +26,7 @@ class QueryBuilder {
     ];
 
 
-    const USERNAMES = [
+    public const USERNAMES = [
         "aniesbaswedan" => AccountType::CANDIDATE,
         "prabowo" => AccountType::CANDIDATE,
         "ganjarpranowo" => AccountType::CANDIDATE,
@@ -64,7 +65,7 @@ class QueryBuilder {
 
     public static function for(string $target)
     {
-        $instance = new self;
+        $instance = new self();
         return $instance->generateQueryFor($target);
     }
 
@@ -82,7 +83,7 @@ class QueryBuilder {
             $query = $this->queryForInfluencer();
         } else {
             throw new PollBotException("No match account type");
-            
+
         }
 
         if (strlen($query) >= 512) {
@@ -112,8 +113,17 @@ class QueryBuilder {
 
     private function queryForMe()
     {
-        $me = Cache::remember(self::CURRENT_USER_CACHE_KEY, now()->addMonth(), function() {
-            return (new Twitter)->getMe()->data;
+        $me = Cache::remember(self::CURRENT_USER_CACHE_KEY, now()->addMonth(), function () {
+            $data = (new Twitter())->getMe()->data;
+            $exists = Account::where('twitter_id', $data->id)->exists();
+            if (!$exists) {
+                Account::create([
+                    'twitter_id'    => $data->id,
+                    'username'    => $data->username,
+                    'name'    => $data->name,
+                ]);
+            }
+            return $data;
         });
         return "from:{$me->username}";
     }
@@ -142,6 +152,6 @@ class QueryBuilder {
     private function queryForInfluencer()
     {
         throw new PollBotException("Query not yet ready for influencer");
-        
+
     }
 }

@@ -23,9 +23,18 @@ class Poll
     public function __construct()
     {
         $this->candidates = PollChoice::all();
-        $this->twitter = new Twitter;
-        $this->me = Cache::remember(QueryBuilder::CURRENT_USER_CACHE_KEY, now()->addMonth(), function() {
-            return $this->twitter->getMe()->data;
+        $this->twitter = new Twitter();
+        $this->me = Cache::remember(QueryBuilder::CURRENT_USER_CACHE_KEY, now()->addMonth(), function () {
+            $data = $this->twitter->getMe()->data;
+            $exists = Account::where('twitter_id', $data->id)->exists();
+            if (!$exists) {
+                Account::create([
+                    'twitter_id'    => $data->id,
+                    'username'    => $data->username,
+                    'name'    => $data->name,
+                ]);
+            }
+            return $data;
         });
 
     }
@@ -34,7 +43,7 @@ class Poll
     {
         Log::info("Poll::run() running...");
 
-        $instance = new self;
+        $instance = new self();
         $instance->execute(query: Twitter::queryFor($target));
 
         Log::info("Poll::run() ran!");
@@ -69,7 +78,7 @@ class Poll
             }
 
             $data = $response->data;
-            
+
             if ($data) {
                 $this->processTweets($response);
             }
@@ -95,7 +104,7 @@ class Poll
                 $tweet = $account->tweets()->create([
                     'twitter_id' => $twitterTweet->id,
                     'text' => $twitterTweet->text,
-                    'url' => "https://twitter.com/{$account->username}/status/{$twitterTweet->id}",
+                    'url' => "https://twitter.com/{$this->me->username}/status/{$twitterTweet->id}",
                     'type'  => 'text'
                 ]);
             }
@@ -151,16 +160,15 @@ TXT;
         );
 
         $db = $this->storeToDatabase($tweet, $twitterTweet);
-        $account = $db['account'];
 
-        $url = "https://twitter.com/{$account->username}/status/{$twitterTweet->data->id}";
+        $url = "https://twitter.com/{$this->me->username}/status/{$twitterTweet->data->id}";
         Log::info("Poll posted in {$url}!");
 
     }
 
     public function storeToDatabase(Tweet $tweet, $twitterTweet)
     {
-        $account = Account::where('username', $tweet->account->username)->first();
+        $account = Account::where('username', $this->me->username)->first();
 
         $pollTweet = $account->tweets()->create([
             'twitter_id' => $twitterTweet->data->id,

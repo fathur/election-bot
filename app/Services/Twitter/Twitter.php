@@ -34,8 +34,7 @@ class Twitter
         $userFields = null,
         $expansions = null,
         $maxResults = 10,
-    )
-    {
+    ) {
         $parameters = [
             'query' => $query,
             'max_results' => $maxResults,
@@ -78,9 +77,8 @@ class Twitter
         $inReplyToTweetId = null,
         $pollOptions = [],
         $pollDurationMinutes = null
-    )
-    {
-        
+    ) {
+
         $parameters = [
             'text' => $text
         ];
@@ -120,8 +118,7 @@ class Twitter
         $pollFields = null,
         $tweetFields = null,
         $userFields = null,
-    )
-    {
+    ) {
         $parameters = [];
 
         if ($expansions != null) {
