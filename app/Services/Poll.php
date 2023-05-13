@@ -138,8 +138,8 @@ class Poll
         Log::info("Poll posting...");
 
         $text = <<<TXT
-Siapakah calon presiden pilihanmu di 2024? "
-Vote sebagai bentuk kepedulianmu terhadap pemilu ini! \n\n"
+Siapakah calon presiden pilihanmu di 2024?
+Vote sebagai bentuk kepedulianmu terhadap pemilu ini! \n\n
 Retweet untuk menyebarkan, dan beri 🧡 jika bermanfaat.
 TXT;
 
@@ -150,29 +150,37 @@ TXT;
             pollDurationMinutes: self::POLL_DURATION_MINUTES
         );
 
-        $this->storeToDatabase($tweet, $twitterTweet);
+        $db = $this->storeToDatabase($tweet, $twitterTweet);
+        $account = $db['account'];
 
-        $url = "https://twitter.com/{$this->me->username}/status/{$twitterTweet->data->id}";
+        $url = "https://twitter.com/{$account->username}/status/{$twitterTweet->data->id}";
         Log::info("Poll posted in {$url}!");
 
     }
 
     public function storeToDatabase(Tweet $tweet, $twitterTweet)
     {
-        $account = Account::where('username', $this->me->username)->first();
+        $account = Account::where('username', $tweet->account->username)->first();
+
         $pollTweet = $account->tweets()->create([
             'twitter_id' => $twitterTweet->data->id,
             'parent_id' => $tweet->id,
-            'url'   => "https://twitter.com/{$this->me->username}/status/{$twitterTweet->data->id}",
+            'url'   => "https://twitter.com/{$account->username}/status/{$twitterTweet->data->id}",
             'text'  => $twitterTweet->data->text,
             'type'  => 'poll'
         ]);
 
         // Store the poll option to pivot table
-        $pollTweet->poll()->save(new \App\Models\Poll([
+        $poll = $pollTweet->poll()->save(new \App\Models\Poll([
             'start_at'  => now(),
             'end_at'    => now()->addMinutes(self::POLL_DURATION_MINUTES)
         ]));
+
+        return [
+            'account'   => $account,
+            'tweet'     => $pollTweet,
+            'poll'      => $poll
+        ];
     }
 
     public function shuffleCandidates()
