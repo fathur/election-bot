@@ -29,6 +29,8 @@ class Tweet extends Model
 
     public function hasPoll()
     {
-        return $this->poll == null ? false : true;
+        return self::where('parent_id', $this->id)
+            ->where('type', 'poll')
+            ->exists();
     }
 }

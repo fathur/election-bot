@@ -98,13 +98,15 @@ class Poll
         Log::info("Tweet processing...");
 
         foreach ($response->data as $twitterTweet) {
+
+            // This is the original tweet, either from candidates, media, or parties.
             $tweet = Tweet::where('twitter_id', $twitterTweet->id)->first();
             if (!$tweet) {
                 $account = $this->getAccount($response, $twitterTweet);
                 $tweet = $account->tweets()->create([
                     'twitter_id' => $twitterTweet->id,
                     'text' => $twitterTweet->text,
-                    'url' => "https://twitter.com/{$this->me->username}/status/{$twitterTweet->id}",
+                    'url' => "https://twitter.com/{$account->username}/status/{$twitterTweet->id}",
                     'type'  => 'text'
                 ]);
             }
@@ -152,6 +154,7 @@ Vote sebagai bentuk kepedulianmu terhadap pemilu ini! \n\n
 Retweet untuk menyebarkan, dan beri 🧡 jika bermanfaat.
 TXT;
 
+        // Bot tweet
         $twitterTweet = $this->twitter->createTweet(
             inReplyToTweetId: $tweet->twitter_id,
             text: $text,
@@ -166,13 +169,13 @@ TXT;
 
     }
 
-    public function storeToDatabase(Tweet $tweet, $twitterTweet)
+    public function storeToDatabase(Tweet $parentTweet, $twitterTweet)
     {
         $account = Account::where('username', $this->me->username)->first();
 
         $pollTweet = $account->tweets()->create([
             'twitter_id' => $twitterTweet->data->id,
-            'parent_id' => $tweet->id,
+            'parent_id' => $parentTweet->id,
             'url'   => "https://twitter.com/{$account->username}/status/{$twitterTweet->data->id}",
             'text'  => $twitterTweet->data->text,
             'type'  => 'poll'
