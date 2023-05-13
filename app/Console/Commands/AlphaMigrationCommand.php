@@ -27,10 +27,11 @@ class AlphaMigrationCommand extends Command
      */
     public function handle()
     {
-        $this->migrateChoices();
-        $this->migrateAccounts();
-        $this->migrateTweets();
-        $this->migratePolls();
+        // $this->migrateChoices();
+        // $this->migrateAccounts();
+        // $this->migrateTweets();
+        // $this->migratePolls();
+        $this->migratePollResults();
     }
 
     protected function migrateChoices()
@@ -149,6 +150,11 @@ class AlphaMigrationCommand extends Command
             }
         }
         $this->info('Poll migrated!');
+
+    }
+
+    protected function migratePollResults()
+    {
 
     }
 }
