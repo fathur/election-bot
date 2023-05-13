@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-class Report {
-    
+class Report
+{
     public static function generate($interval)
     {
         echo($interval);

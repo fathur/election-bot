@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('polls', function (Blueprint $table) {
             $table->id();
-            $table->string('object_id')->unique();
+            $table->string('twitter_id')->unique()->nullable();
             $table->foreignId('tweet_id')->constrained(
                 table: 'tweets'
             );
             $table->timestamp('start_at');
             $table->timestamp('end_at');
-            $table->unsignedInteger('total_voters');
+            $table->unsignedInteger('total_voters')->nullable();
             $table->timestamps();
         });
     }

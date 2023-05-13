@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('accounts', function (Blueprint $table) {
             $table->id();
-            $table->string('object_id')->unique();
+            $table->string('twitter_id')->unique();
             $table->string('username')->unique();
             $table->string('name');
             $table->timestamps();

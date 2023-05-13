@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('tweets', function (Blueprint $table) {
             $table->id();
-            $table->string('object_id')->unique();
+            $table->string('twitter_id')->unique();
+            $table->foreignId('parent_id')->nullable()->constrained(
+                table: 'tweets'
+            );
             $table->foreignId('account_id')->constrained(
-                table: 'users'
+                table: 'accounts'
             );
             $table->string('url')->unique();
             $table->text('text');

@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use App\Services\Poll;
+use Illuminate\Support\Facades\Log;
 
 class PollCommand extends Command
 {
@@ -12,7 +13,7 @@ class PollCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'poll {--for= : Where the poll should be placed}';
+    protected $signature = 'poll {--target= : Where the poll should be placed}';
 
     /**
      * The console command description.
@@ -26,7 +27,11 @@ class PollCommand extends Command
      */
     public function handle()
     {
-        $for = $this->option('for');
-        Poll::run(for: $for);
+        Log::info("Command poll --target running...");
+
+        $target = $this->option('target');
+        Poll::run(target: $target);
+
+        Log::info("Command poll --target={$target} run successfully!");
     }
 }
