@@ -8,6 +8,7 @@ use App\Services\Twitter\QueryBuilder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Models\PollChoice;
+use App\Models\Country;
 use App\Models\Account;
 use App\Models\Tweet;
 
@@ -19,6 +20,7 @@ class Poll
     private $enableLookupTweet = true;
     private $candidates;
     private $twitter;
+    private $countries;
 
     public function __construct()
     {
@@ -36,6 +38,8 @@ class Poll
             }
             return $data;
         });
+
+        $this->countries = Country::all();
 
     }
 
@@ -93,11 +97,69 @@ class Poll
 
     }
 
+    protected function isPassTextFilter(string $text): bool
+    {
+        $isPassed = true;
+
+        # Filter international country name
+        $countries = $this->countries->pluck('name')->map(function ($country) {
+            return strtolower($country);
+        })->all();
+
+
+        foreach ($countries as $country) {
+            if (stripos($text, $country) !== false) {  //
+                $isPassed = false;
+                break;
+            }
+        }
+
+        if ($isPassed === false) {
+            return $isPassed;
+        }
+
+        # Filter indonesia locale country name
+        $countries = $this->countries->pluck('locale_name')->map(function ($country) {
+            return json_decode($country)->id;
+        })->unique()->reject('')->all();
+
+
+        foreach ($countries as $country) {
+            if (stripos($text, $country) !== false) {  //
+                $isPassed = false;
+                break;
+            }
+        }
+
+        if ($isPassed === false) {
+            return $isPassed;
+        }
+
+        # Filter specific keywords
+        $keywords = ['caleg', 'pileg'];
+        foreach ($keywords as $keyword) {
+            if (stripos($text, $keyword) !== false) {  //
+                $isPassed = false;
+                break;
+            }
+        }
+
+        if ($isPassed === false) {
+            return $isPassed;
+        }
+
+        return $isPassed;
+    }
+
     public function processTweets($response)
     {
         Log::info("Tweet processing...");
 
         foreach ($response->data as $twitterTweet) {
+
+            if (!$this->isPassTextFilter($twitterTweet->text)) {
+                continue;
+            }
 
             // This is the original tweet, either from candidates, media, or parties.
             $tweet = Tweet::where('twitter_id', $twitterTweet->id)->first();
