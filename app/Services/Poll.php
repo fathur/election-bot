@@ -158,6 +158,10 @@ class Poll
         foreach ($response->data as $twitterTweet) {
 
             if (!$this->isPassTextFilter($twitterTweet->text)) {
+                Log::warning([
+                    "message" => "Not pass filter",
+                    "text" => $twitterTweet->text
+                ]);
                 continue;
             }
 
