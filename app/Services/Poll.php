@@ -136,7 +136,7 @@ class Poll
         }
 
         # Filter specific keywords
-        $keywords = ['caleg', 'pileg'];
+        $keywords = ['caleg', 'pileg', 'bacaleg'];
         foreach ($keywords as $keyword) {
             if (stripos($text, $keyword) !== false) {  //
                 $isPassed = false;
