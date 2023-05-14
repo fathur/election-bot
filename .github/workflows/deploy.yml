@@ -23,4 +23,16 @@ jobs:
         mkdir ~/.ssh
         echo "$DEPLOYER_PRIVATE_KEY" > ~/.ssh/prod.pem
         chmod 600 ~/.ssh/prod.pem
+        cat >>~/.ssh/config <<END
+            Host github
+              Hostname github.com
+              IdentityFile ~/.ssh/prod.pem
+              IdentitiesOnly yes
+            Host host_name
+              HostName ec2-108-137-1-118.ap-southeast-3.compute.amazonaws.com
+              User ubuntu
+              Port 22
+              IdentityFile ~/.ssh/prod.pem
+              StrictHostKeyChecking no
+          END
         vendor/bin/dep deploy production
