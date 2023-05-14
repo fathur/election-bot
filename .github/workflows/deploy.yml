@@ -18,6 +18,4 @@ jobs:
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
     - name: Deployment
       run: |
-        echo ${{secrets.HOLA}}
-        echo ${{secrets.JOHN}}
-        echo "lalal"
+        echo ${{secrets.DEPLOYER_PRIVATE_KEY}}
