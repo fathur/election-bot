@@ -5,12 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Tweet extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['twitter_id', 'parent_id', 'account_id', 'url', 'text', 'type'];
+    protected $fillable = ['twitter_id', 'parent_id', 'account_id', 'url', 'text', 'type', 'alpha_tweet_id', 'alpha_poll_tweet_id'];
 
     public function account()
     {

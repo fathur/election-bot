@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use DateTimeZone;
 
 class Kernel extends ConsoleKernel
 {
@@ -18,7 +19,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('poll --target=candidate')->everyFifteenMinutes();
 
         // Run media schedule every 15 minutes in Monday until Friday, at 6 am until 9 am, 12pm until 1pm, and 5pm until 9pm
-        $schedule->command('poll --target=media')->everyFifteenMinutes()
+        $schedule->command('poll --target=media')
+            ->timezone('Asia/Jakarta')
+            ->everyFifteenMinutes()
             ->between('6:00', '9:00')
             ->between('12:00', '13:00')
             ->between('17:00', '21:00')
@@ -26,8 +29,10 @@ class Kernel extends ConsoleKernel
             ->withoutOverlapping();
 
         // Run media schedule every 15 minutes in Saturday until Sunday, at 6 am untul 10pm
-        $schedule->command('poll --target=media')->everyFifteenMinutes()
-            ->between('17:00', '21:00')
+        $schedule->command('poll --target=media')
+            ->timezone('Asia/Jakarta')
+            ->everyFifteenMinutes()
+            ->between('6:00', '22:00')
             ->days([0, 6])
             ->withoutOverlapping();
 

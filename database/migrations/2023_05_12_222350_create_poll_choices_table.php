@@ -36,7 +36,7 @@ return new class extends Migration
         DB::table('poll_choices')->insert([
             ['option' => 'Anies Baswedan', 'is_considered' => true],
             ['option' => 'Prabowo Subianto', 'is_considered' => true],
-            ['option' => 'Ganjar Pranomo', 'is_considered' => true],
+            ['option' => 'Ganjar Pranowo', 'is_considered' => true],
             ['option' => 'Belum ada pilihan', 'is_considered' => false],
         ]);
     }
