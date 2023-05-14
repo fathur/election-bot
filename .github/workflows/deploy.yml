@@ -18,5 +18,7 @@ jobs:
       run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
     - name: Deployment
       run: |
+        pwd
         echo "${{secrets.DEPLOYER_PRIVATE_KEY}}" >> storages/deploy.pem
+
         cat storages/deploy.pem
