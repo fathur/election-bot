@@ -1,8 +1,8 @@
 name: Production deployment
 
-on: [push]
-  # push:
-    # tags: [ "*" ]
+on:
+  push:
+    tags: [ "*" ]
 
 jobs:
   deploy:
@@ -19,6 +19,8 @@ jobs:
     - name: Deploy
       env: 
         DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+        DEPLOYER_USER: ${{ secrets.DEPLOYER_USER }}
+        DEPLOYER_SERVER_HOST: ${{ secrets.DEPLOYER_SERVER_HOST }}
       run: |
         mkdir ~/.ssh
         echo "$DEPLOYER_PRIVATE_KEY" > ~/.ssh/prod.pem
@@ -28,9 +30,9 @@ jobs:
               Hostname github.com
               IdentityFile ~/.ssh/prod.pem
               IdentitiesOnly yes
-            Host production
-              HostName ec2-108-137-1-118.ap-southeast-3.compute.amazonaws.com
-              User ubuntu
+            Host pemilu-kita.prod
+              HostName $DEPLOYER_SERVER_HOST
+              User $DEPLOYER_USER
               Port 22
               IdentityFile ~/.ssh/prod.pem
               StrictHostKeyChecking no
