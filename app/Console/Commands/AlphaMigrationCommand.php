@@ -27,10 +27,10 @@ class AlphaMigrationCommand extends Command
      */
     public function handle()
     {
-        // $this->migrateChoices();
-        // $this->migrateAccounts();
-        // $this->migrateTweets();
-        // $this->migratePolls();
+        $this->migrateChoices();
+        $this->migrateAccounts();
+        $this->migrateTweets();
+        $this->migratePolls();
         $this->migratePollResults();
     }
 
