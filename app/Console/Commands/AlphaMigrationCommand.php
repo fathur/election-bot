@@ -206,7 +206,7 @@ class AlphaMigrationCommand extends Command
 
             }
 
-            $tweet->poll->pollChoices()->attach($attacheData);
+            $tweet->poll->pollChoices()->sync($attacheData);
         }
     }
 }
