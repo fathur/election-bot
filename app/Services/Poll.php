@@ -127,6 +127,7 @@ class Poll
             return $isPassed;
         }
 
+
         # Filter indonesia locale country name
         $countries = $this->countries->pluck('locale_name')->map(function ($country) {
             return json_decode($country)->id;
@@ -144,10 +145,23 @@ class Poll
             return $isPassed;
         }
 
+
         # Filter specific keywords
-        $keywords = ['caleg', 'pileg', 'bacaleg', 'legislatif', 'DPR', 'DPD'];
-        foreach ($keywords as $keyword) {
+        $caseSensitiveKeywords = ['DPR', 'DPD'];
+        foreach ($caseSensitiveKeywords as $keyword) {
             if (strpos($text, $keyword) !== false) {  //
+                $isPassed = false;
+                break;
+            }
+        }
+        if ($isPassed === false) {
+            return $isPassed;
+        }
+
+
+        $caseInsensitiveKeywords = ['caleg', 'pileg', 'bacaleg', 'legislatif', 'pilkada'];
+        foreach ($caseInsensitiveKeywords as $keyword) {
+            if (stripos($text, $keyword) !== false) {  //
                 $isPassed = false;
                 break;
             }
@@ -156,6 +170,7 @@ class Poll
         if ($isPassed === false) {
             return $isPassed;
         }
+
 
         return $isPassed;
     }
