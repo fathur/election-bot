@@ -1,0 +1,40 @@
+name: Production deployment
+
+on:
+  push:
+    tags: [ "*" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.1'
+        extensions: mbstring
+    - uses: actions/checkout@v3
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+    - name: Deploy
+      env: 
+        DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
+        DEPLOYER_USER: ${{ secrets.DEPLOYER_USER }}
+        DEPLOYER_SERVER_HOST: ${{ secrets.DEPLOYER_SERVER_HOST }}
+      run: |
+        mkdir ~/.ssh
+        echo "$DEPLOYER_PRIVATE_KEY" > ~/.ssh/prod.pem
+        chmod 600 ~/.ssh/prod.pem
+        cat >>~/.ssh/config <<END
+            Host github
+              Hostname github.com
+              IdentityFile ~/.ssh/prod.pem
+              IdentitiesOnly yes
+            Host pemilu-kita.prod
+              HostName $DEPLOYER_SERVER_HOST
+              User $DEPLOYER_USER
+              Port 22
+              IdentityFile ~/.ssh/prod.pem
+              StrictHostKeyChecking no
+        END
+        vendor/bin/dep deploy production
