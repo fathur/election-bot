@@ -19,4 +19,5 @@ jobs:
     - name: Deployment
       run: |
         echo ${{secrets.HOLA}}
+        echo ${{secrets.JOHN}}
         echo "lalal"
