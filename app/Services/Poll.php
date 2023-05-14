@@ -47,13 +47,22 @@ class Poll
     {
         Log::info("Poll::run() running...");
 
+        if ($target == 'candidate') {
+            $shouldFilterText = false;
+        } else {
+            $shouldFilterText = true;
+        }
+
         $instance = new self();
-        $instance->execute(query: Twitter::queryFor($target));
+        $instance->execute(
+            query: Twitter::queryFor($target),
+            shouldFilterText: $shouldFilterText
+        );
 
         Log::info("Poll::run() ran!");
     }
 
-    public function execute($query)
+    public function execute($query, $shouldFilterText = true)
     {
         Log::info("Query `{$query}` executing...");
 
@@ -84,7 +93,7 @@ class Poll
             $data = $response->data;
 
             if ($data) {
-                $this->processTweets($response);
+                $this->processTweets($response, $shouldFilterText);
             }
             if (property_exists($meta, 'next_token')) {
                 $nextToken = $meta->next_token;
@@ -136,9 +145,9 @@ class Poll
         }
 
         # Filter specific keywords
-        $keywords = ['caleg', 'pileg', 'bacaleg'];
+        $keywords = ['caleg', 'pileg', 'bacaleg', 'legislatif', 'DPR', 'DPD'];
         foreach ($keywords as $keyword) {
-            if (stripos($text, $keyword) !== false) {  //
+            if (strpos($text, $keyword) !== false) {  //
                 $isPassed = false;
                 break;
             }
@@ -151,13 +160,13 @@ class Poll
         return $isPassed;
     }
 
-    public function processTweets($response)
+    public function processTweets($response, $shouldFilterText = true)
     {
         Log::info("Tweet processing...");
 
         foreach ($response->data as $twitterTweet) {
 
-            if (!$this->isPassTextFilter($twitterTweet->text)) {
+            if ($shouldFilterText && !$this->isPassTextFilter($twitterTweet->text)) {
                 Log::warning([
                     "message" => "Not pass filter",
                     "text" => $twitterTweet->text
