@@ -23,7 +23,19 @@ class Kernel extends ConsoleKernel
             ->timezone('Asia/Jakarta')
             ->everyFifteenMinutes()
             ->between('6:00', '9:00')
+            ->days([1, 2, 3, 4, 5])
+            ->withoutOverlapping();
+
+        $schedule->command('poll --target=media')
+            ->timezone('Asia/Jakarta')
+            ->everyFifteenMinutes()
             ->between('12:00', '13:00')
+            ->days([1, 2, 3, 4, 5])
+            ->withoutOverlapping();
+
+        $schedule->command('poll --target=media')
+            ->timezone('Asia/Jakarta')
+            ->everyFifteenMinutes()
             ->between('17:00', '21:00')
             ->days([1, 2, 3, 4, 5])
             ->withoutOverlapping();
