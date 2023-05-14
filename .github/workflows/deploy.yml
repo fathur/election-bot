@@ -20,6 +20,7 @@ jobs:
       env: 
         DEPLOYER_PRIVATE_KEY: ${{ secrets.DEPLOYER_PRIVATE_KEY }}
       run: |
+        mkdir ~/.ssh
         echo "$DEPLOYER_PRIVATE_KEY" > ~/.ssh/prod.pem
         chmod 600 ~/.ssh/prod.pem
         vendor/bin/dep deploy production
