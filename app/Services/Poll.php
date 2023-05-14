@@ -8,6 +8,7 @@ use App\Services\Twitter\QueryBuilder;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use App\Models\PollChoice;
+use App\Models\Country;
 use App\Models\Account;
 use App\Models\Tweet;
 
@@ -19,6 +20,7 @@ class Poll
     private $enableLookupTweet = true;
     private $candidates;
     private $twitter;
+    private $countries;
 
     public function __construct()
     {
@@ -37,19 +39,30 @@ class Poll
             return $data;
         });
 
+        $this->countries = Country::all();
+
     }
 
     public static function run(string $target)
     {
         Log::info("Poll::run() running...");
 
+        if ($target == 'candidate') {
+            $shouldFilterText = false;
+        } else {
+            $shouldFilterText = true;
+        }
+
         $instance = new self();
-        $instance->execute(query: Twitter::queryFor($target));
+        $instance->execute(
+            query: Twitter::queryFor($target),
+            shouldFilterText: $shouldFilterText
+        );
 
         Log::info("Poll::run() ran!");
     }
 
-    public function execute($query)
+    public function execute($query, $shouldFilterText = true)
     {
         Log::info("Query `{$query}` executing...");
 
@@ -80,7 +93,7 @@ class Poll
             $data = $response->data;
 
             if ($data) {
-                $this->processTweets($response);
+                $this->processTweets($response, $shouldFilterText);
             }
             if (property_exists($meta, 'next_token')) {
                 $nextToken = $meta->next_token;
@@ -93,11 +106,73 @@ class Poll
 
     }
 
-    public function processTweets($response)
+    protected function isPassTextFilter(string $text): bool
+    {
+        $isPassed = true;
+
+        # Filter international country name
+        $countries = $this->countries->pluck('name')->map(function ($country) {
+            return strtolower($country);
+        })->all();
+
+
+        foreach ($countries as $country) {
+            if (stripos($text, $country) !== false) {  //
+                $isPassed = false;
+                break;
+            }
+        }
+
+        if ($isPassed === false) {
+            return $isPassed;
+        }
+
+        # Filter indonesia locale country name
+        $countries = $this->countries->pluck('locale_name')->map(function ($country) {
+            return json_decode($country)->id;
+        })->unique()->reject('')->all();
+
+
+        foreach ($countries as $country) {
+            if (stripos($text, $country) !== false) {  //
+                $isPassed = false;
+                break;
+            }
+        }
+
+        if ($isPassed === false) {
+            return $isPassed;
+        }
+
+        # Filter specific keywords
+        $keywords = ['caleg', 'pileg', 'bacaleg', 'legislatif', 'DPR', 'DPD'];
+        foreach ($keywords as $keyword) {
+            if (strpos($text, $keyword) !== false) {  //
+                $isPassed = false;
+                break;
+            }
+        }
+
+        if ($isPassed === false) {
+            return $isPassed;
+        }
+
+        return $isPassed;
+    }
+
+    public function processTweets($response, $shouldFilterText = true)
     {
         Log::info("Tweet processing...");
 
         foreach ($response->data as $twitterTweet) {
+
+            if ($shouldFilterText && !$this->isPassTextFilter($twitterTweet->text)) {
+                Log::warning([
+                    "message" => "Not pass filter",
+                    "text" => $twitterTweet->text
+                ]);
+                continue;
+            }
 
             // This is the original tweet, either from candidates, media, or parties.
             $tweet = Tweet::where('twitter_id', $twitterTweet->id)->first();
