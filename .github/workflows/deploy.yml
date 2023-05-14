@@ -6,9 +6,8 @@ on: [push]
 
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
-
+    environment: production
     steps:
     - uses: shivammathur/setup-php@v2
       with:
