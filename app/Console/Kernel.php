@@ -22,30 +22,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('poll --target=media')
             ->timezone('Asia/Jakarta')
             ->everyFifteenMinutes()
-            ->between('6:00', '9:00')
-            ->days([1, 2, 3, 4, 5])
-            ->withoutOverlapping();
-
-        $schedule->command('poll --target=media')
-            ->timezone('Asia/Jakarta')
-            ->everyFifteenMinutes()
-            ->between('12:00', '13:00')
-            ->days([1, 2, 3, 4, 5])
-            ->withoutOverlapping();
-
-        $schedule->command('poll --target=media')
-            ->timezone('Asia/Jakarta')
-            ->everyFifteenMinutes()
-            ->between('17:00', '21:00')
-            ->days([1, 2, 3, 4, 5])
-            ->withoutOverlapping();
-
-        // Run media schedule every 15 minutes in Saturday until Sunday, at 6 am untul 10pm
-        $schedule->command('poll --target=media')
-            ->timezone('Asia/Jakarta')
-            ->everyFifteenMinutes()
-            ->between('6:00', '22:00')
-            ->days([0, 6])
+            ->between('6:00', '23:59')
             ->withoutOverlapping();
 
         // Generate report daily
