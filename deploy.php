@@ -11,7 +11,7 @@ set('repository', 'git@github.com:fathur/election-bot.git');
 
 host('production')
     ->set('hostname', 'pemilu-kita.prod')
-    ->set('deploy_path', '/codes/election-bot-dep')
+    ->set('deploy_path', '/codes/election-bot')
     ->set('http_user', 'ubuntu');
 
 // Hooks
