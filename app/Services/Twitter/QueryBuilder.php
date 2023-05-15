@@ -23,6 +23,7 @@ class QueryBuilder
         "pilpres",
         "election",
         "pemilu",
+        "musra"
     ];
 
 
