@@ -31,7 +31,8 @@ class Poll extends Model
     public function choices(): BelongsToMany
     {
         return $this->belongsToMany(PollChoice::class, 'poll_results')
-            ->withPivot('total_voters');
+            ->withPivot('total_voters')
+            ->withTimestamps();;
     }
 
     /**
@@ -41,6 +42,7 @@ class Poll extends Model
      */
     public function reports(): BelongsToMany
     {
-        return $this->belongsToMany(Report::class, 'report_polls');
+        return $this->belongsToMany(Report::class, 'report_polls')
+            ->withTimestamps();;
     }
 }

@@ -126,6 +126,7 @@ class Report
             'resume' => json_encode($resume)
         ]);
         $report->choices()->sync($syncData);
+        $report->polls()->sync($pollIds->all());
 
         Log::info("Stored to db!");
         return $report;
