@@ -249,7 +249,7 @@ TXT;
         }
 
         $tweet .= $candidateResult;
-        $tweet .= "\n - 🤖";
+        $tweet .= "\n 🤖";
         Log::info([
             "message" => $tweet
         ]);
