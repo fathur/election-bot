@@ -43,7 +43,7 @@ class Report
     {
         Log::info("{$interval} report generating...");
         if ($interval == ReportInterval::DAILY->text()) {
-            (new self())->generateDailyReport('2023-05-15');
+            (new self())->generateDailyReport();
         }
         Log::info("{$interval} report generated!");
 
