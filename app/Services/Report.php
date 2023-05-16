@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\ReportInterval;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Models\Tweet;
+use App\Models\Account;
 use App\Models\Poll;
 use App\Models\PollChoice;
 use App\Models\Report as ReportModel;
@@ -12,6 +13,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Log;
 use App\Services\Twitter\Twitter;
 use App\Exceptions\ReportException;
+use Illuminate\Support\Facades\Cache;
+use App\Services\Twitter\QueryBuilder;
 
 class Report
 {
@@ -22,6 +25,18 @@ class Report
     {
         $this->choices = PollChoice::all();
         $this->twitter = new Twitter();
+        $this->me = Cache::remember(QueryBuilder::CURRENT_USER_CACHE_KEY, now()->addMonth(), function () {
+            $data = $this->twitter->getMe()->data;
+            $exists = Account::where('twitter_id', $data->id)->exists();
+            if (!$exists) {
+                Account::create([
+                    'twitter_id'    => $data->id,
+                    'username'    => $data->username,
+                    'name'    => $data->name,
+                ]);
+            }
+            return $data;
+        });
     }
 
     public static function generate(string $interval)
@@ -67,7 +82,9 @@ class Report
             return;
         }
 
-        $this->storeReport($polls);
+        $report = $this->storeReport($polls);
+
+        $this->postReportToTwitter($report);
 
         Log::info("Report generated!");
 
@@ -105,11 +122,13 @@ class Report
             'start_at' => $reportStartAt,
             'end_at' => $reportEndAt,
             'total_voters' => $reportTotalVoters,
+            'total_polls' => count($polls),
             'resume' => json_encode($resume)
         ]);
         $report->choices()->sync($syncData);
 
         Log::info("Stored to db!");
+        return $report;
 
     }
 
@@ -135,7 +154,6 @@ class Report
 
         if (property_exists($result, 'errors') and ($result->errors != null || count($result->errors) > 0)) {
             throw new ReportException("Failed to get the twitter data");
-
         }
 
         $twitterTweets = collect($result->data);
@@ -210,5 +228,50 @@ class Report
 
         Log::info("Poll fetched!");
 
+    }
+
+    protected function postReportToTwitter($report)
+    {
+        $humanStartAt = $report->start_at->addHours(7)->format('d M Y H:i');
+        $humanEndAt = $report->end_at->addHours(7)->format('d M Y H:i');
+
+        $tweet = <<<TXT
+Berikut hasil poll dari {$report->total_voters} voter di {$report->total_polls} polling 
+yang dimulai dari {$humanStartAt} WIB hingga {$humanEndAt} WIB:\n\n
+TXT;
+        $candidateResult = "";
+        $i = 1;
+        foreach (json_decode($report->resume) as $item) {
+            $percentage = ($item->voters / $report->total_voters) * 100;
+            $percentage = round($percentage, 2);
+            $candidateResult .= "{$i}. {$item->option}: {$item->voters} ({$percentage}%)\n";
+            $i++;
+        }
+
+        $tweet .= $candidateResult;
+        $tweet .= "\n - 🤖";
+        Log::info([
+            "message" => $tweet
+        ]);
+
+        $response = $this->twitter->createTweet($tweet);
+        $twitterTweet = $response->data;
+
+        $account = Account::where('username', $this->me->username)->first();
+
+        Log::info([
+            'account' => $account->id
+        ]);
+
+        $tweet = $account->tweets()->create([
+            'twitter_id' => $twitterTweet->id,
+            'url'   => "https://twitter.com/{$account->username}/status/{$twitterTweet->id}",
+            'text'  => $twitterTweet->text,
+            'type'  => 'report'
+        ]);
+
+        Log::info([
+            'tweet' => $tweet->id
+        ]);
     }
 }

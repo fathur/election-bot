@@ -11,7 +11,13 @@ class Report extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['interval', 'start_at', 'end_at', 'total_voters', 'resume'];
+    protected $fillable = ['interval', 'start_at', 'end_at', 'total_voters', 'resume', 'total_polls'];
+
+    protected $casts = [
+        'start_at'  => 'datetime',
+        'end_at'  => 'datetime',
+        'total_voters'  => 'integer',
+    ];
 
     /**
      * The polls that belong to the Report
