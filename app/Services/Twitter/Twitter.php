@@ -112,6 +112,37 @@ class Twitter
         return $this->client->post('tweets', $parameters, true);
     }
 
+    public function getTweets(
+        $ids,
+        $expansions = null,
+        $pollFields = null,
+        $tweetFields = null,
+        $userFields = null,
+    ) {
+        $parameters = [
+            'ids' => $ids
+        ];
+
+        if ($expansions != null) {
+            $parameters['expansions'] = $expansions;
+        }
+
+        if ($pollFields != null) {
+            $parameters['poll.fields'] = $pollFields;
+        }
+
+        if ($tweetFields != null) {
+            $parameters['tweet.fields'] = $tweetFields;
+        }
+
+        if ($userFields != null) {
+            $parameters['user.fields'] = $userFields;
+        }
+
+
+        return $this->client->get("tweets", $parameters);
+    }
+
     public function getTweet(
         $id,
         $expansions = null,

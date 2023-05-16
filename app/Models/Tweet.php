@@ -12,7 +12,11 @@ class Tweet extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['twitter_id', 'parent_id', 'account_id', 'url', 'text', 'type', 'alpha_tweet_id', 'alpha_poll_tweet_id'];
+    protected $fillable = [
+        'twitter_id', 'parent_id', 'account_id', 'url', 'text', 'type', 'alpha_tweet_id', 'alpha_poll_tweet_id',
+        'metric_fetch_at', 'total_public_retweets', 'total_public_likes', 'total_public_quotes',
+        'total_public_comments', 'total_public_impressions'
+    ];
 
     public function account()
     {

@@ -24,11 +24,11 @@ class Poll extends Model
     }
 
     /**
-     * The pollChoices that belong to the Poll
+     * The choices that belong to the Poll
      *
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function pollChoices(): BelongsToMany
+    public function choices(): BelongsToMany
     {
         return $this->belongsToMany(PollChoice::class, 'poll_results')
             ->withPivot('total_voters');
