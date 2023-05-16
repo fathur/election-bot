@@ -33,7 +33,6 @@ class Poll extends Model
         return $this->belongsToMany(PollChoice::class, 'poll_results')
             ->withPivot('total_voters')
             ->withTimestamps();
-            ;
     }
 
     /**
@@ -45,6 +44,5 @@ class Poll extends Model
     {
         return $this->belongsToMany(Report::class, 'report_polls')
             ->withTimestamps();
-            ;
     }
 }
