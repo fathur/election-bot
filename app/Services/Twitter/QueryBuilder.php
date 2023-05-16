@@ -6,6 +6,7 @@ use App\Exceptions\PollBotException;
 use Illuminate\Support\Facades\Cache;
 use App\Services\Twitter\Twitter;
 use App\Enums\AccountType;
+use App\Models\Account;
 
 class QueryBuilder
 {
