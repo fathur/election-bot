@@ -43,7 +43,7 @@ class Report
     {
         Log::info("{$interval} report generating...");
         if ($interval == ReportInterval::DAILY->text()) {
-            (new self())->generateDailyReport('2023-05-11');
+            (new self())->generateDailyReport('2023-05-15');
         }
         Log::info("{$interval} report generated!");
 
@@ -206,7 +206,15 @@ class Report
             $syncedData = [];
             $totalPollVoters = 0;
             foreach ($twitterPoll->options as $option) {
-                $choice = $this->choices->where('option', $option->label)->first();
+
+                // Typo make error
+                if ($option->label == "Ganjar Pranomo") {
+                    $label = "Ganjar Pranowo";
+                } else {
+                    $label = $option->label;
+                }
+
+                $choice = $this->choices->where('option', $label)->first();
                 $candidateId = $choice->id;
                 $totalOptionVoters = $option->votes;
 
