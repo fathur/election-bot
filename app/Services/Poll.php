@@ -241,7 +241,9 @@ class Poll
         $text = <<<TXT
 Siapakah calon presiden pilihanmu di 2024?
 Vote sebagai bentuk kepedulianmu terhadap pemilu ini! \n\n
-Retweet untuk menyebarkan, dan beri 🧡 jika bermanfaat. - 🤖
+Retweet untuk menyebarkan, beri 🧡 jika bermanfaat, dan follow akun
+kami untuk mendapatkan laporan polling.\n
+🤖
 TXT;
 
         // Bot tweet

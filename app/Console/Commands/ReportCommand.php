@@ -19,7 +19,7 @@ class ReportCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Generate report';
+    protected $description = 'Generate report based on selected time interval';
 
     /**
      * Execute the console command.
