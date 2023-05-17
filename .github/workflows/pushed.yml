@@ -1,9 +1,6 @@
 name: Pushed feature commit
 
 on:
-  # pull_request:
-  #   branches:
-  #     - 'main'
   push:
     branches-ignore:
       - "main"
