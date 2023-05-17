@@ -5,11 +5,11 @@ namespace App\Services;
 use App\Services\Twitter\Twitter;
 use Illuminate\Support\Facades\Log;
 
-class Sentiment {
+class Sentiment
+{
+    public const SEARCH_LAST_MINUTES = 60 * 24;
+    public const MAX_TWITTER_API_CALL = 100;
 
-    const SEARCH_LAST_MINUTES = 60 * 24;
-    const MAX_TWITTER_API_CALL = 100;
-    
     private $twitter;
 
     public function __construct()
@@ -19,7 +19,7 @@ class Sentiment {
 
     public static function fetchTweets()
     {
-        (new self)->getTweets();
+        (new self())->getTweets();
     }
 
     public function getTweets()
