@@ -39,4 +39,9 @@ class Tweet extends Model
             ->where('type', 'poll')
             ->exists();
     }
+
+    public function sentiment()
+    {
+        return $this->hasOne(Sentiment::class);
+    }
 }

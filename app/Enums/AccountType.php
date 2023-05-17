@@ -10,6 +10,8 @@ enum AccountType
     case MEDIA;
     case PARTY;
     case INFLUENCER;
+    
+    case SENTIMENT; // Not used for poll
 
     public function text()
     {

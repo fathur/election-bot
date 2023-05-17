@@ -83,6 +83,8 @@ class QueryBuilder
             $query = $this->queryForParty();
         } elseif ($target == AccountType::INFLUENCER->text()) {
             $query = $this->queryForInfluencer();
+        } elseif ($target == AccountType::SENTIMENT->text()) {
+            $query = $this->queryForSentiment();
         } else {
             throw new PollBotException("No match account type");
 
@@ -107,9 +109,15 @@ class QueryBuilder
         return "({$string})";
     }
 
-    protected function keywordsStatement()
+    protected function keywordsStatement($moreKeywords = [])
     {
-        $string = implode(' OR ', self::KEYWORDS);
+        if (count($moreKeywords) > 0) {
+            $keywords = array_merge(self::KEYWORDS, $moreKeywords);
+        } else {
+            $keywords = self::KEYWORDS;
+        }
+
+        $string = implode(' OR ', $keywords);
         return "({$string})";
     }
 
@@ -155,5 +163,11 @@ class QueryBuilder
     {
         throw new PollBotException("Query not yet ready for influencer");
 
+    }
+
+    private function queryForSentiment()
+    {
+        // return $this->keywordsStatement();
+        return "(anies OR baswedan OR ganjar OR pranowo OR prabowo OR subianto)";
     }
 }
