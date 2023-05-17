@@ -22,6 +22,8 @@ class Poll
     private $twitter;
     private $countries;
 
+    protected $me;
+
     public function __construct()
     {
         $this->candidates = PollChoice::all();

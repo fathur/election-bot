@@ -1,0 +1,6 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+vendor/bin/phpstan analyze app --memory-limit 1G
+vendor/bin/php-cs-fixer fix app
+vendor/bin/psalm

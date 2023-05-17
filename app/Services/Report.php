@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\App;
 use App\Enums\ReportInterval;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use App\Models\Tweet;
@@ -20,6 +21,7 @@ class Report
 {
     protected $twitter;
     protected $choices;
+    protected $me;
 
     public function __construct()
     {
@@ -141,7 +143,7 @@ class Report
         ]);
 
         $tweetFields = ['created_at', 'public_metrics'];
-        if (\App::environment('production')) {
+        if (App::environment('production')) {
             array_push($tweetFields, 'organic_metrics');
         }
 
@@ -180,7 +182,7 @@ class Report
             $tweet->total_likes = $publicMetrics->like_count;
             $tweet->total_quotes = $publicMetrics->quote_count;
 
-            if (\App::environment('production')) {
+            if (App::environment('production')) {
                 $organicMetrics = $twitterTweet->organic_metrics;
 
                 $tweet->total_impressions = $organicMetrics->impression_count;

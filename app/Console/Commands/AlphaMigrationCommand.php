@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use App\Services\Twitter\QueryBuilder;
+use App\Exceptions\PollBotException;
 
 class AlphaMigrationCommand extends Command
 {
@@ -137,8 +138,8 @@ class AlphaMigrationCommand extends Command
                 $tweet->parent_id = \App\Models\Tweet::where('twitter_id', $alphaPoll->tweet_id)->first()->id;
 
                 $tweet->timestamps = false;
-                $tweet->created_at = $alphaTweet->created_at;
-                $tweet->updated_at = $alphaTweet->updated_at;
+                $tweet->created_at = $alphaPoll->created_at;
+                $tweet->updated_at = $alphaPoll->updated_at;
                 $tweet->save();
             } else {
                 $me = Cache::get(QueryBuilder::CURRENT_USER_CACHE_KEY);
