@@ -61,12 +61,9 @@ class Report
             $untilAt = Carbon::now()->subDay(1);
         }
 
-        $fromAt = Carbon::parse($until)->subDay(2);
-
         $polls = Poll::with('tweet')
             ->whereNull('total_voters')
             ->where('end_at', '<=', $untilAt)
-            ->where('start_at', '>=', $fromAt)
             ->orderBy('end_at', 'asc')
             ->get();
 
