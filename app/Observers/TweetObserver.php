@@ -10,7 +10,7 @@ class TweetObserver
     public function created(Tweet $tweet): void
     {
         if ($tweet->type == 'sentiment') {
-            $tweet->save(new Sentiment());
+            $tweet->sentiment()->save(new Sentiment());
         }
     }
 }

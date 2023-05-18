@@ -4,11 +4,15 @@ namespace App\Services;
 
 use App\Services\Twitter\Twitter;
 use Illuminate\Support\Facades\Log;
+use App\Models\{
+    Account,
+    Tweet
+};
 
 class Sentiment
 {
-    public const SEARCH_LAST_MINUTES = 60 * 24;
-    public const MAX_TWITTER_API_CALL = 100;
+    public const SEARCH_LAST_MINUTES = 60 * 24 * 7;
+    public const MAX_TWITTER_API_CALL = 1;
 
     private $twitter;
 
@@ -37,11 +41,27 @@ class Sentiment
                 sortOrder: 'recency',
                 nextToken: $nextToken,
                 userFields: 'id,username,name',
-                expansions: 'author_id',
-                maxResults: 100
+                tweetFields: 'author_id,in_reply_to_user_id,public_metrics,referenced_tweets,conversation_id',
+                expansions: 'author_id,in_reply_to_user_id,referenced_tweets.id,referenced_tweets.id.author_id',
+                maxResults: 10
             );
             $i++;
             Log::info("Tweets searched! Endpoint hit!");
+
+            
+            Log::info(json_encode($response));
+
+            $data = $response->data;
+
+            if ($data) {
+                $this->processTweets($response);
+            }
+
+            if (!property_exists($response, 'meta')) {
+                Log::warning("No meta property");
+                $loop = false;
+                continue;
+            }
 
             $meta = $response->meta;
             if ($meta->result_count == 0) {
@@ -50,11 +70,6 @@ class Sentiment
                 continue;
             }
 
-            $data = $response->data;
-
-            if ($data) {
-                $this->processTweets($response);
-            }
             if (property_exists($meta, 'next_token')) {
                 $nextToken = $meta->next_token;
             } else {
@@ -69,6 +84,40 @@ class Sentiment
 
     public function processTweets($response)
     {
-        Log::info(json_encode($response->data));
+        Log::info(json_encode($response));
+
+        $twitterTweets = $response->data;
+        $meta = $response->meta;
+        $includes = $response->includes;
+
+        $users = collect($includes->users);
+        foreach ($twitterTweets as $twitterTweet) {
+            Log::info("Processing {$twitterTweet->id}");
+
+            $user = $users->where('id', $twitterTweet->author_id)->first();
+
+            $account = Account::where('twitter_id', $twitterTweet->author_id)->first();
+            if (!$account) {
+                $account = Account::create([
+                    'twitter_id' => $user->id,
+                    'username'  => $user->username,
+                    'name'  => $user->name
+                ]);
+            }
+
+            $tweet = $account->tweets()->where('twitter_id', $twitterTweet->id)->exists();
+            if ($tweet) {
+                continue;
+            }
+
+            $account->tweets()->create([
+                'type'  => 'sentiment',
+                'text'  => $twitterTweet->text,
+                'twitter_id'   => $twitterTweet->id,
+                'url'   => "https://twitter.com/{$user->username}/status/{$twitterTweet->id}"
+            ]);
+            
+        }
+
     }
 }

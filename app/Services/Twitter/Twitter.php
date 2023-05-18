@@ -32,6 +32,7 @@ class Twitter
         $sortOrder = 'recency',
         $nextToken = null,
         $userFields = null,
+        $tweetFields = null,
         $expansions = null,
         $maxResults = 10,
     ) {
@@ -67,6 +68,10 @@ class Twitter
 
         if ($userFields != null) {
             $parameters['user.fields'] = $userFields;
+        }
+
+        if ($tweetFields != null) {
+            $parameters['tweet.fields'] = $tweetFields;
         }
 
         return $this->client->get('tweets/search/recent', $parameters);

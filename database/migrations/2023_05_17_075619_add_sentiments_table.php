@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('sentiments', function(Blueprint $table) {
+            $table->id();
+
             $table->foreignId('tweet_id')->constrained();
             $table->boolean('value')->nullable()->comment('true for positive, false for negative');
+            $table->timestamps();
+
         });
     }
 
