@@ -22,7 +22,7 @@ class Poll extends Model
     {
         return $this->belongsTo(Tweet::class);
     }
-
+    // select * from "polls" where "total_voters" is null and "end_at" <= '2023-05-17 03:13:59' and "start_at" >= '2023-05-16 03:13:59' order by "end_at" asc;
     /**
      * The choices that belong to the Poll
      *

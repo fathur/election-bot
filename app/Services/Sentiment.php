@@ -48,7 +48,7 @@ class Sentiment
             $i++;
             Log::info("Tweets searched! Endpoint hit!");
 
-            
+
             Log::info(json_encode($response));
 
             $data = $response->data;
@@ -116,7 +116,7 @@ class Sentiment
                 'twitter_id'   => $twitterTweet->id,
                 'url'   => "https://twitter.com/{$user->username}/status/{$twitterTweet->id}"
             ]);
-            
+
         }
 
     }
