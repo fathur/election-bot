@@ -255,7 +255,7 @@ TXT;
         foreach (json_decode($report->resume) as $item) {
             $percentage = ($item->voters / $report->total_voters) * 100;
             $percentage = round($percentage, 2);
-            $candidate = Str::of('Anies Baswedan')->prepend('#')->title()->remove(' ');
+            $candidate = Str::of($item->option)->prepend('#')->title()->remove(' ');
             $candidateResult .= "{$i}. {$candidate}: {$item->voters} ({$percentage}%)\n";
             $i++;
         }
