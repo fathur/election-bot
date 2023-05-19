@@ -16,6 +16,7 @@ use App\Services\Twitter\Twitter;
 use App\Exceptions\ReportException;
 use Illuminate\Support\Facades\Cache;
 use App\Services\Twitter\QueryBuilder;
+use Illuminate\Support\Str;
 
 class Report
 {
@@ -246,13 +247,16 @@ class Report
         $tweet = <<<TXT
 Berikut hasil poll dari {$report->total_voters} voter di {$report->total_polls} polling 
 yang dimulai dari {$humanStartAt} WIB hingga {$humanEndAt} WIB:\n\n
+
+#prabowo #anies #ganjar #pilpres
 TXT;
         $candidateResult = "";
         $i = 1;
         foreach (json_decode($report->resume) as $item) {
             $percentage = ($item->voters / $report->total_voters) * 100;
             $percentage = round($percentage, 2);
-            $candidateResult .= "{$i}. {$item->option}: {$item->voters} ({$percentage}%)\n";
+            $candidate = Str::of($item->option)->prepend('#')->title()->remove(' ');
+            $candidateResult .= "{$i}. {$candidate}: {$item->voters} ({$percentage}%)\n";
             $i++;
         }
 

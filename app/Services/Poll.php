@@ -243,9 +243,9 @@ class Poll
         $text = <<<TXT
 Siapakah calon presiden pilihanmu di 2024?
 Vote sebagai bentuk kepedulianmu terhadap pemilu ini! \n\n
-Retweet, like, dan reply untuk mendukung polling ini.
-Follow akun kami untuk mendapatkan agregat laporan.
-🦾
+Retweet, like, dan reply untuk mendukung polling ini. Follow akun kami untuk mendapatkan agregat laporan. 🦾
+
+#prabowo #anies #ganjar #pilpres
 TXT;
 
         // Bot tweet
