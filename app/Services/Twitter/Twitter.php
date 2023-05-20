@@ -69,7 +69,13 @@ class Twitter
             $parameters['user.fields'] = $userFields;
         }
 
-        return $this->client->get('tweets/search/recent', $parameters);
+        $response = $this->client->get('tweets/search/recent', $parameters);
+        Log::info([
+            "mark" =>  "Searh recent tweets",
+            "parameters" => json_encode($parameters),
+            "response" => json_encode($response)
+        ]);
+        return $response;
     }
 
     public function createTweet(
@@ -109,7 +115,13 @@ class Twitter
         }
 
 
-        return $this->client->post('tweets', $parameters, true);
+        $response = $this->client->post('tweets', $parameters, true);
+        Log::info([
+            "mark" =>  "Create new tweet",
+            "parameters" => json_encode($parameters),
+            "response" => json_encode($response)
+        ]);
+        return $response;
     }
 
     public function getTweets(
@@ -140,7 +152,14 @@ class Twitter
         }
 
 
-        return $this->client->get("tweets", $parameters);
+        $response = $this->client->get("tweets", $parameters);
+        Log::info([
+            "mark" =>  "Get one tweets",
+            "ids" => json_encode($ids),
+            "parameters" => json_encode($parameters),
+            "response" => json_encode($response)
+        ]);
+        return $response;
     }
 
     public function getTweet(
@@ -169,7 +188,14 @@ class Twitter
         }
 
 
-        return $this->client->get("tweets/{$id}", $parameters);
+        $response = $this->client->get("tweets/{$id}", $parameters);
+        Log::info([
+            "mark" =>  "Get one tweet",
+            "id" => $id,
+            "parameters" => json_encode($parameters),
+            "response" => json_encode($response)
+        ]);
+        return $response;
     }
 
     public function getMe()
