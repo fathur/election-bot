@@ -4,6 +4,7 @@ namespace App\Services\Twitter;
 
 use Abraham\TwitterOAuth\TwitterOAuth;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class Twitter
 {
