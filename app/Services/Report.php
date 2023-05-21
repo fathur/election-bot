@@ -245,10 +245,9 @@ class Report
         $humanEndAt = $report->end_at->addHours(7)->format('d M Y H:i');
 
         $tweet = <<<TXT
-Berikut hasil poll dari {$report->total_voters} voter di {$report->total_polls} polling 
-yang dimulai dari {$humanStartAt} WIB hingga {$humanEndAt} WIB:\n\n
+Berikut hasil #poll dari {$report->total_voters} voter di {$report->total_polls} #polling 
+yang dimulai dari {$humanStartAt} hingga {$humanEndAt} WIB:\n\n
 
-#prabowo #anies #ganjar #pilpres
 TXT;
         $candidateResult = "";
         $i = 1;
