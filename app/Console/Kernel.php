@@ -22,12 +22,19 @@ class Kernel extends ConsoleKernel
         $schedule->command('poll --target=media')
             ->timezone('Asia/Jakarta')
             ->everyFifteenMinutes()
+            ->days([
+                Schedule::SUNDAY,
+                Schedule::TUESDAY,
+                Schedule::THURSDAY,
+                Schedule::SATURDAY,
+            ])
             ->between('6:00', '23:59')
             ->withoutOverlapping();
 
         // Generate report daily
-        // $schedule->command('report --interval=daily')
-        //     ->dailyAt('6:00');
+        $schedule->command('report --interval=daily')
+            ->timezone('Asia/Jakarta')
+            ->dailyAt('7:00');
 
         // // Generate report weekly on Monday at 6:00
         // $schedule->command('report --interval=weekly')
